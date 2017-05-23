@@ -1,0 +1,21 @@
+A.微信开发功能（例如：扫一扫）：
+流程：
+1、引入weixin.js文件
+2、前端传递参数：debug,jsApiList(需要授权的功能),url(当前页面的链接):location.href
+3、<script src="域名+请求接口+参数">获取到后端返回的wx.config({})数据
+4、开始调用对应的功能（注：weixin  suceess后this指针的指向发生变化，需要修改为箭头函数；返回的值是否为json串，不是需要进行 JSON.parse(str)）
+wx.scanQRCode({
+          needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+          scanType: ["qrCode", "barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+          success: (res) => {
+            this.param = JSON.parse(res.resultStr); // 当needResult 为 1 时，扫码返回的结果
+            S.get_signin_course({
+              arrangementId: this.param.arrangementId, //课程安排ID
+              courseId: this.param.courseId, //课程ID
+              userId: NAPI.user.get().userId //用户ID
+            }).then((data) => {
+              this.courseInfo = data;
+              this.courseMemberNoti(this.courseInfo.userApplyStatus);
+            })
+          }
+        });
